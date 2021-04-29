@@ -29,13 +29,17 @@ pkgdown::build_site()
 usethis::use_git_ignore("docs")
 usethis::use_git_ignore("inst/docs")
 
-#test
+#Update
+devtools::document()
 devtools::load_all()
 devtools::test()
+devtools::build()
 
 # build package 
 attachment::att_amend_desc()
 devtools::check()
 devtools::install()
 devtools::build_readme()
+
+# 
 pkgdown::build_site()

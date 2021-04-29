@@ -31,7 +31,12 @@ devtools::install_github("alaindanet/sizeTrophicInteractions")
 
 ## Example
 
+```{r example}
+library(sizeTrophicInteractions)
+```
+
 ### Generate individual size
+
 
 #### With Pokémon 
 
@@ -49,7 +54,7 @@ devtools::install_github("alaindanet/sizeTrophicInteractions")
     size = c(seq(10, 15), rnorm(30, 10, 2))
   )
 
-  output <- get_size_from_lot(
+get_size_from_lot(
     lot = lot,
     id_var = id,
     type_var = type,
@@ -65,9 +70,7 @@ devtools::install_github("alaindanet/sizeTrophicInteractions")
 
 ### With OFB data
 
-```{r example}
-library(sizeTrophicInteractions)
-
+```{r}
 # sample of OFB data
 data(ind_measure_testing)
 data(lot_testing)
