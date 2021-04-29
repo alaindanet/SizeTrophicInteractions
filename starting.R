@@ -11,6 +11,7 @@ use_readme_rmd()
 use_vignette("intro")
 use_package_doc()
 use_testthat()
+use_pipe()
 
 #data
 use_data()
@@ -33,7 +34,7 @@ devtools::load_all()
 devtools::test()
 
 # build package 
-attachment::att_to_description()
+attachment::att_amend_desc()
 devtools::check()
 devtools::install()
 devtools::build_readme()

@@ -234,7 +234,7 @@ test_that("generate fish works on a sample dataset", {
       type_var = type_lot,
       nb_var = lop_effectif,
       min_var = lop_longueur_specimens_taille_mini,
-      max_var = lop_longueur_specimens_taille_mini,
+      max_var = lop_longueur_specimens_taille_maxi,
       species = species,
       measure = measure_test,
       measure_id_var = mei_lop_id,

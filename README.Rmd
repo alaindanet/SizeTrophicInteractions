@@ -23,33 +23,67 @@ The goal of sizeTrophicInteractions is to ...
 
 ## Installation
 
-You can install the released version of sizeTrophicInteractions from [CRAN](https://CRAN.R-project.org) with:
+You can install sizeTrophicInteractions with:
 
 ``` r
-install.packages("sizeTrophicInteractions")
+devtools::install_github("alaindanet/sizeTrophicInteractions")
 ```
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+### Generate individual size
+
+#### With Pokémon 
+
+```{r}
+  lot <- tibble::tibble(
+    id = seq(1:4),
+    species = rep(c("Pikachu", "Salameche"), each = 2),
+    type = c("I", "N", "S/L", "G"),
+    min = c(rep(NA, 3), 1),
+    max = c(rep(NA, 3), 2),
+    nb = c(5, 1, 50, 10)
+  )
+  measure <- tibble::tibble(
+    id = c(rep(1, 5), 2, rep(3, 30)),
+    size = c(seq(10, 15), rnorm(30, 10, 2))
+  )
+
+  output <- get_size_from_lot(
+    lot = lot,
+    id_var = id,
+    type_var = type,
+    nb_var = nb,
+    min_var = min,
+    max_var = max,
+    species = species,
+    measure = measure,
+    measure_id_var = id,
+    size_var = size)
+```
+
+
+### With OFB data
 
 ```{r example}
 library(sizeTrophicInteractions)
-## basic example code
+
+# sample of OFB data
+data(ind_measure_testing)
+data(lot_testing)
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+```{r}
+get_size_from_lot(
+      lot = lot_testing,
+      id_var = lop_id,
+      type_var = type_lot,
+      nb_var = lop_effectif,
+      min_var = lop_longueur_specimens_taille_mini,
+      max_var = lop_longueur_specimens_taille_maxi,
+      species = species,
+      measure = ind_measure_testing,
+      measure_id_var = mei_lop_id,
+      size_var = mei_taille)
 
-```{r cars}
-summary(cars)
 ```
-
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this. You could also use GitHub Actions to re-render `README.Rmd` every time you push. An example workflow can be found here: <https://github.com/r-lib/actions/tree/master/examples>.
-
-You can also embed plots, for example:
-
-```{r pressure, echo = FALSE}
-plot(pressure)
-```
-
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.

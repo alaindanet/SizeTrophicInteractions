@@ -15,6 +15,7 @@ Imports:
     dplyr,
     igraph,
     lubridate,
+    magrittr,
     purrr,
     rlang,
     stringr,
@@ -23,8 +24,11 @@ Imports:
     tidyselect,
     truncdist
 Suggests: 
+    datasets,
     knitr,
+    parallel,
     rmarkdown,
+    rprojroot,
     testthat (>= 3.0.0)
 VignetteBuilder: 
     knitr

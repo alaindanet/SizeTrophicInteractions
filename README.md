@@ -12,45 +12,80 @@ The goal of sizeTrophicInteractions is to …
 
 ## Installation
 
-You can install the released version of sizeTrophicInteractions from
-[CRAN](https://CRAN.R-project.org) with:
+You can install sizeTrophicInteractions with:
 
 ``` r
-install.packages("sizeTrophicInteractions")
+devtools::install_github("alaindanet/sizeTrophicInteractions")
 ```
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+### Generate individual size
+
+#### With Pokémon
+
+``` r
+  lot <- tibble::tibble(
+    id = seq(1:4),
+    species = rep(c("Pikachu", "Salameche"), each = 2),
+    type = c("I", "N", "S/L", "G"),
+    min = c(rep(NA, 3), 1),
+    max = c(rep(NA, 3), 2),
+    nb = c(5, 1, 50, 10)
+  )
+  measure <- tibble::tibble(
+    id = c(rep(1, 5), 2, rep(3, 30)),
+    size = c(seq(10, 15), rnorm(30, 10, 2))
+  )
+
+  output <- get_size_from_lot(
+    lot = lot,
+    id_var = id,
+    type_var = type,
+    nb_var = nb,
+    min_var = min,
+    max_var = max,
+    species = species,
+    measure = measure,
+    measure_id_var = id,
+    size_var = size)
+```
+
+### With OFB data
 
 ``` r
 library(sizeTrophicInteractions)
-## basic example code
-```
 
-What is special about using `README.Rmd` instead of just `README.md`?
-You can include R chunks like so:
+# sample of OFB data
+data(ind_measure_testing)
+data(lot_testing)
+```
 
 ``` r
-summary(cars)
-#>      speed           dist       
-#>  Min.   : 4.0   Min.   :  2.00  
-#>  1st Qu.:12.0   1st Qu.: 26.00  
-#>  Median :15.0   Median : 36.00  
-#>  Mean   :15.4   Mean   : 42.98  
-#>  3rd Qu.:19.0   3rd Qu.: 56.00  
-#>  Max.   :25.0   Max.   :120.00
+get_size_from_lot(
+      lot = lot_testing,
+      id_var = lop_id,
+      type_var = type_lot,
+      nb_var = lop_effectif,
+      min_var = lop_longueur_specimens_taille_mini,
+      max_var = lop_longueur_specimens_taille_maxi,
+      species = species,
+      measure = ind_measure_testing,
+      measure_id_var = mei_lop_id,
+      size_var = mei_taille)
+#> incorrect lot G have been filtered
+#> # A tibble: 3,530 x 3
+#>     lop_id species fish      
+#>      <int> <chr>   <list>    
+#>  1 2141822 VAI     <dbl [6]> 
+#>  2 4298431 BAF     <dbl [3]> 
+#>  3 4390067 BAF     <dbl [2]> 
+#>  4 4152850 TRF     <dbl [15]>
+#>  5 2461191 TRF     <dbl [11]>
+#>  6 2276025 ABL     <dbl [3]> 
+#>  7 2395932 ABL     <dbl [11]>
+#>  8 3153703 CHE     <dbl [8]> 
+#>  9 4736608 PSR     <dbl [4]> 
+#> 10 2398199 TRF     <dbl [16]>
+#> # … with 3,520 more rows
 ```
-
-You’ll still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date. `devtools::build_readme()` is handy for this. You could also
-use GitHub Actions to re-render `README.Rmd` every time you push. An
-example workflow can be found here:
-<https://github.com/r-lib/actions/tree/master/examples>.
-
-You can also embed plots, for example:
-
-<img src="man/figures/README-pressure-1.png" width="100%" />
-
-In that case, don’t forget to commit and push the resulting figure
-files, so they display on GitHub and CRAN.

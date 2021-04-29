@@ -2,6 +2,7 @@
 #' 
 #' @param lot data.frame
 #' @inheritParams gen_fish_from_lot
+#' @export
 get_size_from_lot <- function(
   lot = NULL, id_var = NULL, type_var = NULL, nb_var = NULL,
   min_var = NULL, max_var = NULL, species = NULL,
@@ -26,14 +27,14 @@ get_size_from_lot <- function(
   size_var_chr <- rlang::quo_name(size_var)
 
   # Filter surnumerous variable:
-  lot %<>%
+  lot <- lot %>% 
     dplyr::select(!!id_var, !!type_var, !!nb_var, !!species, !!min_var, !!max_var)
-  measure %<>%
+  measure <- measure %>% 
     dplyr::select(!!measure_id_var, !!size_var)
 
   # Filter surnumerous id in measure:
   if (any(! measure[[measure_id_var_chr]] %in% lot[[id_var_chr]])) {
-    measure %<>%
+    measure <- measure %>%
       dplyr::filter(!!measure_id_var %in% lot[[id_var_chr]])
     message("surnumerous lot in measure were removed")
   }
@@ -43,14 +44,14 @@ get_size_from_lot <- function(
   if (any(is.na(lot[[type_var_chr]]) |
       any(!lot[[type_var_chr]] %in% diff_lot_type))
     ) {
-    lot %<>%
+    lot <- lot %>%
       dplyr::filter(! is.na(!!type_var) & !!type_var %in% diff_lot_type)
     message("NA lot id and lot type has been filtered")
   }
 
   # Filter if effectif is not present:
   if (any(is.na(lot[[nb_var_chr]])) | any(!lot[[nb_var_chr]] > 0)) {
-    lot %<>%
+    lot <- lot %>%
       dplyr::filter( (!is.na(!!nb_var)) & !!nb_var > 0)
     message("Incorrect effectif has been filtered")
   }
@@ -65,13 +66,14 @@ get_size_from_lot <- function(
   if (any(c(nrow(na_G), nrow(incorrect_G)) != 0)) {
     G_bad_id <- c(na_G[[id_var_chr]], incorrect_G[[id_var_chr]], low_n_G[[id_var_chr]])
 
-    lot %<>% dplyr::filter(!( !!id_var %in% G_bad_id))
+    lot <- lot %>%
+      dplyr::filter(!( !!id_var %in% G_bad_id))
     message("incorrect lot G have been filtered")
   }
 
 
   gen_fish_from_lot <- compiler::cmpfun(gen_fish_from_lot)
-  lot$fish <- mcMap(gen_fish_from_lot,
+  lot$fish <- parallel::mcMap(gen_fish_from_lot,
 	  id = lot[[id_var_chr]],
 	  type = lot[[type_var_chr]],
 	  min_size = lot[[min_var_chr]],
@@ -219,14 +221,14 @@ get_check_lot <- function(
   size_var_chr <- rlang::quo_name(size_var)
 
   # Filter surnumerous variable:
-  lot %<>%
+  lot <- lot %>%
     dplyr::select(!!id_var, !!type_var, !!nb_var, !!species, !!min_var, !!max_var)
-  measure %<>%
+  measure <- measure %>%
     dplyr::select(!!measure_id_var, !!size_var)
 
   # Filter surnumerous id in measure:
   if (any(! measure[[measure_id_var_chr]] %in% lot[[id_var_chr]])) {
-    measure %<>%
+    measure <- measure %>%
       dplyr::filter(!!measure_id_var %in% lot[[id_var_chr]])
     message("surnumerous lot in measure were removed")
   }
@@ -235,7 +237,7 @@ get_check_lot <- function(
   output <- lot %>%
     dplyr::mutate(
       fish =
-	mcMap(check_lot,
+	parallel::mcMap(check_lot,
 	  id = !!id_var,
 	  type = !!type_var,
 	  min_size = !!min_var,
@@ -365,7 +367,7 @@ rm_dbl_fishing_op <- function (op = NULL, sep_threshold = 270, nb_sampling = 10)
     dplyr::filter(freq >= nb_sampling)
   
 
-  op %<>% 
+  op <- op %>%
     dplyr::filter(station %in% good_station$station, opcod %in% clean_dbl$opcod) %>%
     dplyr::mutate(year = lubridate::year(date))
 
@@ -429,7 +431,8 @@ get_op_wo_holes <- function (.op = NULL) {
     filter(year %in% get_longest_consecutive_time_series(year)) %>%
     filter(n() >= 10)
 
-  sep_y %<>% ungroup()
+  sep_y <- sep_y %>%
+    ungroup()
 
   message(".op had ", length(unique(.op$station)), " stations.")
   message("filtered dataset contains ", length(unique(sep_y$station)), " stations.")
