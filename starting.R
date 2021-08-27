@@ -30,8 +30,8 @@ usethis::use_git_ignore("docs")
 usethis::use_git_ignore("inst/docs")
 
 #Update
+#devtools::load_all()
 devtools::document()
-devtools::load_all()
 devtools::test()
 devtools::build()
 

@@ -19,6 +19,8 @@ compute_prey_size(
 \item{pred_win}{data.frame containing species and the predation window
 parameters (\alpha and \beta).}
 
+\item{species}{blabla}
+
 \item{beta_min}{column name containing beta_min parameters}
 
 \item{beta_max}{column name contains beta_max parameters}

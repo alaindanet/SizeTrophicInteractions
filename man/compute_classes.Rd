@@ -31,7 +31,7 @@ compute_classes(
 1.}
 }
 \value{
-
+blabla
 }
 \description{
 Compute classes

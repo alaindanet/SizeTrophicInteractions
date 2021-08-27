@@ -16,6 +16,7 @@ Imports:
     igraph,
     lubridate,
     magrittr,
+    parallel,
     purrr,
     rlang,
     stringr,
@@ -26,7 +27,6 @@ Imports:
 Suggests: 
     datasets,
     knitr,
-    parallel,
     rmarkdown,
     rprojroot,
     testthat (>= 3.0.0)

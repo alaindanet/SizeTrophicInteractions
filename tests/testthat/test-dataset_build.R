@@ -1,4 +1,3 @@
-context("dataset_build")
 
 library('magrittr')
 library('tibble')
@@ -227,7 +226,7 @@ NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA),
 -182L))
 
 test_that("generate fish works on a sample dataset", {
-  expect_warning(
+  expect_message(
     output <- get_size_from_lot(
       lot = lot_test,
       id_var = lop_id,
@@ -240,7 +239,7 @@ test_that("generate fish works on a sample dataset", {
       measure_id_var = mei_lop_id,
       size_var = mei_taille)
   )
-  expect_is(output, "data.frame")
+  expect_s3_class(output, "data.frame")
 })
 
 test_that("works with NA", {
@@ -276,7 +275,7 @@ test_that("works with NA", {
   sampled_rows <- sample(seq_along(measure_na$size), 20)
   measure_na$size[sampled_rows] <- NA
 
-  expect_warning(
+
   output <- get_size_from_lot(
     lot = lot,
     id_var = id,
@@ -288,7 +287,7 @@ test_that("works with NA", {
     measure = measure_na,
     measure_id_var = id,
     size_var = size)
-  )
+  expect_s3_class(output, "data.frame")
 
 })
 
@@ -304,7 +303,7 @@ test_that("test for NA or non standard type", {
   )
   lot$type[1] <- NA
 
-  expect_is(
+  expect_s3_class(
     output <- get_size_from_lot(
       lot = lot,
       id_var = id,
@@ -319,23 +318,24 @@ test_that("test for NA or non standard type", {
     , "data.frame"
   )
 
-  one <- lot[2,]
-  expect_is(
+  one <- lot[2, ]
+  expect_type(
     output <- gen_fish_from_lot(
       id = one[["id"]],
       type = one[["type"]],
       min_size = one[["min"]],
       max_size = one[["max"]],
       nb = one[["nb"]],
-      ind_measure = NULL,
-      ind_id = NULL,
-      ind_size = NULL)
-    , "numeric"
+      measure = measure_test,
+      measure_id_var = mei_lop_id,
+      size_var = mei_taille
+    )
+    , "double"
   )
 
   lot$type[1] <- "grrr"
 
-  expect_is(
+  expect_message(
     output <- get_size_from_lot(
       lot = lot,
       id_var = id,
@@ -347,8 +347,6 @@ test_that("test for NA or non standard type", {
       measure = measure_test,
       measure_id_var = mei_lop_id,
       size_var = mei_taille)
-    ,
-    "data.frame"
   )
 })
 
@@ -394,7 +392,7 @@ test_that("test for NA or non standard nb", {
       size_var = mei_taille)
   )
 })
-test_that("test for  type G", {
+test_that("test for incorrect type G", {
 
   lot <- tibble::tibble(
     id = seq(1:4),
@@ -406,7 +404,7 @@ test_that("test for  type G", {
   )
 
   expect_message(
-  output <- get_size_from_lot(
+  get_size_from_lot(
     lot = lot,
     id_var = id,
     type_var = type,
@@ -417,6 +415,8 @@ test_that("test for  type G", {
     measure = measure_test,
     measure_id_var = mei_lop_id,
     size_var = mei_taille)
+  ,
+  "incorrect lot G have been filtered"
 )
 })
 
@@ -436,7 +436,21 @@ test_that("type S/L works with NA", {
   )
   measure$size[31] <- NA
 
-
+    expect_message(
+      get_size_from_lot(
+        lot = lot,
+        id_var = id,
+        type_var = type,
+        nb_var = nb,
+        min_var = min,
+        max_var = max,
+        species = species,
+        measure = measure,
+        measure_id_var = id,
+        size_var = size)
+      ,
+    NA
+  )
 })
 
 test_that("filter of lot measure measure works", {

@@ -12,7 +12,13 @@
 #'
 #' @return data.frame containing local network code and interaction matrix.
 #' @export
-build_local_network <- function (data, species, var, group_var, metaweb, classes = NULL, ...) {
+build_local_network <- function(
+  data,
+  species,
+  var,
+  group_var,
+  metaweb,
+  classes = NULL, ...) {
 
   species <- rlang::enquo(species)
   var <- rlang::enquo(var)
@@ -43,19 +49,18 @@ build_local_network <- function (data, species, var, group_var, metaweb, classes
     tidyr::nest() %>%
     dplyr::mutate(
       network = purrr::map(data, extract_network,
-	species = !!species, var = !!var, metaweb = metaweb,
-	classes = classes, ...),
+        species = !!species, var = !!var, metaweb = metaweb,
+        classes = classes, ...),
       data = purrr::map(data, na.omit)
     )
 
-  output
-
+    return(output)
 }
 
 #' Extract network
-#' 
+#'
 #' Extract local network from a list of species and size
-#' 
+#'
 #' @inheritParams assign_size_class
 #' @param metaweb an object created by the build_metaweb function.
 #'
@@ -137,20 +142,26 @@ assign_size_class <- function (data, species, var, classes) {
   var <- rlang::enquo(var)
 
   #Attribute size class for each fish
-  classes_assigned <- data %>% dplyr::group_by(!!species) %>%
+  classes_assigned <- data %>%
+    dplyr::group_by(!!species) %>%
     tidyr::nest() %>%
     dplyr::mutate(
-      class_id = purrr::pmap(list(data = data, species_name = !! species ),
-	get_size_class, var = !!var, classes = classes))
+      class_id = purrr::pmap(
+        list(data = data, species_name = !!species),
+        get_size_class,
+        var = !!var, classes = classes)
+    )
 
   classes_assigned %>%
     tidyr::unnest(cols = c(data, class_id)) %>%
     dplyr::mutate(class_id = as.integer(class_id)) %>%
-    dplyr::select(!!species, class_id, !!var, tidyselect::everything())
+    dplyr::select(!!species, class_id, !!var, tidyselect::everything()) %>%
+    dplyr::ungroup()
 
 }
-#' Get size classes for a given species 
-#' 
+
+#' Get size classes for a given species
+#'
 #' @param data a data.frame containing species and size variable.
 #' @param species data.frame containing species and the predation window.
 #' @param var variable characterizing the size.

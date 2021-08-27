@@ -11,6 +11,15 @@ sanatize_metaweb(
   nb_class = NULL
 )
 }
+\arguments{
+\item{data}{blabla}
+
+\item{species}{blabla}
+
+\item{fish_diet_shift}{blabla}
+
+\item{nb_class}{blabla}
+}
 \description{
 Sanatize fish length for metaweb
 }

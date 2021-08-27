@@ -27,9 +27,12 @@ get_size_from_lot <- function(
   size_var_chr <- rlang::quo_name(size_var)
 
   # Filter surnumerous variable:
-  lot <- lot %>% 
-    dplyr::select(!!id_var, !!type_var, !!nb_var, !!species, !!min_var, !!max_var)
-  measure <- measure %>% 
+  lot <- lot %>%
+    dplyr::select(!!id_var, !!type_var, !!nb_var,
+      !!species, !!min_var, !!max_var
+    )
+
+  measure <- measure %>%
     dplyr::select(!!measure_id_var, !!size_var)
 
   # Filter surnumerous id in measure:

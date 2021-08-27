@@ -27,6 +27,8 @@ build_metaweb(
 \arguments{
 \item{data}{a dataframe containing species and size variable}
 
+\item{species}{blabla}
+
 \item{size}{data.frame containing species and length.}
 
 \item{pred_win}{data.frame containing species and the predation window

@@ -1,6 +1,7 @@
 
-library('tibble')
-library('magrittr')
+library("tibble")
+library("dplyr")
+library("magrittr")
 data(fish_length_toy)
 
 #######################
@@ -42,8 +43,8 @@ fake <- tibble(
 # Compute_classes
 classes_species <- compute_classes(fake, species, size, nb_class = nb_class)
 test_that("Class dataframe is correct", {
-  pika_class <- split_in_classes(unlist(filter(fake, species == "Pikachu")$size))
-  sala_class <- split_in_classes(unlist(filter(fake, species == "Salameche")$size))
+  pika_class <- split_in_classes(unlist(dplyr::filter(fake, species == "Pikachu")$size))
+  sala_class <- split_in_classes(unlist(dplyr::filter(fake, species == "Salameche")$size))
 
   expected_df <- tibble(
     species = rep(c("Pikachu", "Salameche"), each = nb_class),
@@ -68,7 +69,7 @@ ten_one <- tibble(
   size = c(seq(1, 10), rep(1, 10))
   )
 
-expect_warning(compute_classes(ten_one, species, size, nb_class = nb_class), "The following species had less than two unique size values, so we got rid of them:Salameche", ignore.case = TRUE, all = TRUE)
+expect_warning(compute_classes(ten_one, species, size, nb_class = nb_class), "The following species had less than two unique size values, so we got rid of them:Salameche", ignore.case = TRUE)
 
 not_one <- tibble(
   species = rep("Salameche", each = 10),
@@ -170,8 +171,11 @@ test_that("the links are correctly computed", {
   )
   expected_fish_resource_int <- matrix(rep(0, nb_class * 2 * 2), ncol = nb_class * 2)
   rownames(expected_fish_resource_int) <- unique(fake_resource_shift$species)
-  colnames(expected_fish_resource_int) <- c(unite(classes_species, sp_class,
-      species, class_id, sep = "_") %>% dplyr::select(sp_class) %>% unlist)
+  colnames(expected_fish_resource_int) <- c(
+    tidyr::unite(classes_species, sp_class, species, class_id, sep = "_") %>%
+      dplyr::select(sp_class) %>%
+      unlist
+  )
   names(colnames(expected_fish_resource_int)) <- NULL 
   expected_fish_resource_int["Chetiflor",] <- c(0, 1, 1, rep(1, nb_class-3),
   1, rep(0, nb_class-1))
@@ -205,12 +209,34 @@ test_that("compute_links supports non default options", {
 #############
 #  Metaweb  #
 #############
-test_that("Metabuild returns a correct matrix",{
+test_that("Metabuild returns a correct matrix", {
   metaweb <- build_metaweb(
     fake, species, size = size,
     fake_prey_win, beta_min, beta_max,
     fake_onto_diet_shift, min, max,
     fish = pisc, fake_resource_shift
+  )
+  expect_type(metaweb$metaweb, "double")
+
+    })
+
+test_that("Metabuild works with other column names", {
+  renamed_species <- purrr::map(
+    list(fake, fake_prey_win, fake_onto_diet_shift, fake_resource_shift),
+    ~ .x %>% rename(species_name = species)
+  )
+  metaweb <- build_metaweb(
+    data = renamed_species[[1]],
+    species = species_name,
+    size = size,
+    pred_win = renamed_species[[2]],
+    beta_min = beta_min,
+    beta_max = beta_max,
+    fish_diet_shift = renamed_species[[3]],
+    low_bound = min,
+    upper_bound = max,
+    fish = pisc,
+    resource_diet_shift = renamed_species[[4]]
   )
   expect_type(metaweb$metaweb, "double")
 
@@ -225,5 +251,39 @@ test_that("Sanitize fish_length works", {
     "For the following species, the life stage are not found in fish_diet_shift are absent: Pikachu, "
  )
   expect_equal(unique(fake$species), "Salameche")
-    
+    })
+
+
+test_that("Function works with other species names", {
+
+  renamed_species <- purrr::map(
+    list(fake, fake_prey_win, fake_onto_diet_shift, fake_resource_shift),
+    ~ .x %>%
+      rename(species_name = species) %>%
+      mutate(species_name = stringr::str_replace_all(species_name,
+          c ("Pikachu" = "Pika_chu", "Salameche" = "Sala_meche")
+          ))
+  )
+  metaweb <- build_metaweb(
+    data = renamed_species[[1]],
+    species = species_name,
+    size = size,
+    pred_win = renamed_species[[2]],
+    beta_min = beta_min,
+    beta_max = beta_max,
+    fish_diet_shift = renamed_species[[3]],
+    low_bound = min,
+    upper_bound = max,
+    fish = pisc,
+    resource_diet_shift = renamed_species[[4]]
+  )
+  expect_type(metaweb$metaweb, "double")
+  fake_onto_diet_shift %<>%
+    filter(species != "Pikachu")
+  expect_message(
+    fake <- sanatize_metaweb(data = fake, species = species, fish_diet_shift = fake_onto_diet_shift, nb_class = 9)
+    ,
+    "For the following species, the life stage are not found in fish_diet_shift are absent: Pikachu, "
+ )
+  expect_equal(unique(fake$species), "Salameche")
     })

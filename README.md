@@ -71,7 +71,7 @@ data(lot_testing)
 ```
 
 ``` r
-get_size_from_lot(
+size <- get_size_from_lot(
       lot = lot_testing,
       id_var = lop_id,
       type_var = type_lot,
@@ -83,6 +83,7 @@ get_size_from_lot(
       measure_id_var = mei_lop_id,
       size_var = mei_taille)
 #> incorrect lot G have been filtered
+size
 #> # A tibble: 3,530 x 3
 #>     lop_id species fish      
 #>      <int> <chr>   <list>    

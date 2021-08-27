@@ -77,7 +77,7 @@ data(lot_testing)
 ```
 
 ```{r}
-get_size_from_lot(
+size <- get_size_from_lot(
       lot = lot_testing,
       id_var = lop_id,
       type_var = type_lot,
@@ -88,5 +88,7 @@ get_size_from_lot(
       measure = ind_measure_testing,
       measure_id_var = mei_lop_id,
       size_var = mei_taille)
-
+size
 ```
+
+

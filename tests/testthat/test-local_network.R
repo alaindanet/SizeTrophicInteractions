@@ -55,11 +55,11 @@ test_that("extraction of a network works", {
   station1 <- filter(fake_station, station == 1)
   test <- extract_network(station1, species, size, toy_metaweb)
 
-  expect_is(test, "matrix")
+  expect_type(test, "double")
   expect_equal(dim(test), c(5, 5))
 
   local_network <- extract_network(fake_station, species, size, metaweb = toy_metaweb, out_format = "edge")
-   expect_is(local_network, "matrix")
+   expect_type(local_network, "character")
 
 })
 
@@ -91,12 +91,20 @@ test_that("local network generation works", {
 })
 
 test_that("NA exclusion works", {
-  fake_station$size[sample(1:nrow(fake_station), 1)] <- NA_real_
-
+  if (!any(is.na(fake_station$size))) {
+    fake_station$size[sample(seq_len(nrow(fake_station)), 1)] <-
+      NA_real_
+  }
   expect_message(
     local_network <- build_local_network(
-    fake_station, species, size, station,
-    metaweb = toy_metaweb, out_format = "igraph")
+    data = fake_station,
+    species = species,
+    var = size,
+    group_var = station,
+    metaweb = toy_metaweb,
+    classes = NULL,
+    out_format = "igraph"
+    ), "They have been removed"
   )
   expect_equal(length(which(is.na(unnest(local_network, data)))), 0)
 })
