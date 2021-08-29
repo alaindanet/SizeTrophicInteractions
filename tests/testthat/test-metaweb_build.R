@@ -112,6 +112,24 @@ test_that("We get a correct prey size dataframe", {
 
 })
 
+test_that("Missing pred win is working", {
+
+  missing_prey_win <-  
+  th_prey_size <- compute_prey_size(
+    classes_species, fake_prey_win, species, beta_min, beta_max, pred_win_method = "midpoint")
+test_that("We get a correct prey size dataframe", {
+  expect_s3_class(th_prey_size, "data.frame")
+  expected_prey_size <- classes_species %>%
+    mutate(
+    min_prey = 0.03 * ( (lower + upper) / 2),
+    max_prey = 0.45 * ( (lower + upper) / 2)
+    ) %>% dplyr::select(-lower, -upper)
+
+  expect_identical(th_prey_size, expected_prey_size)
+
+})
+
+
 #######################
 #  Compute piscivory  #
 #######################

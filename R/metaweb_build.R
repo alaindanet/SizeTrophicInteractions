@@ -48,7 +48,9 @@ build_metaweb <- function(data, species, size, pred_win, beta_min, beta_max,
 
 
   # Build the size classes
-  size_class <- compute_classes(data, group_var = !!species, var = !!size, class_method = class_method, na.rm = na.rm, replace_min_by_one = replace_min_by_one)
+  size_class <- compute_classes(data, group_var = !!species, var = !!size,
+    class_method = class_method, na.rm = na.rm, replace_min_by_one =
+      replace_min_by_one)
 
 
   ## Compute the th_prey size min & max + mid-point
@@ -171,8 +173,8 @@ compute_links <- function(size_class, th_prey_size, piscivory_index,
 
   # merge dataset 
   trophic_data <- dplyr::left_join(size_class, th_prey_size,
-    by = c(quo_name(species), "class_id")) %>%
-    dplyr::left_join(., piscivory_index, by = c(quo_name(species), "class_id")) %>%
+    by = c(rlang::quo_name(species), "class_id")) %>%
+    dplyr::left_join(., piscivory_index, by = c(rlang::quo_name(species), "class_id")) %>%
     tidyr::unite(sp_class, !!species, class_id)
     
   pred_classes <- colnames(fish_fish_int)
@@ -391,7 +393,8 @@ compute_classes <- function(size, group_var, var, class_method = "quantile",
     dplyr::group_by(!!group_var) %>%
     dplyr::select(!!group_var, !!var) # ensure that there is only the variable
   #of interest
-  nested_size <- size %>% tidyr::nest()
+  nested_size <- size %>%
+    tidyr::nest()
 
   ## Check that there are at least 2 different values
   check_nb_data <- size %>%
@@ -405,7 +408,7 @@ compute_classes <- function(size, group_var, var, class_method = "quantile",
     dplyr::select(!!group_var) %>% unlist(.)
     
 
-  nested_size %<>% dplyr::filter(!(species %in% species_not_good))
+  nested_size %<>% dplyr::filter(!(!!group_var %in% species_not_good))
 
   if (nrow(nested_size) == 0) {
     stop("None of the species got more of two unique values. Check your dataset.")
@@ -500,7 +503,7 @@ sanatize_metaweb <- function(
     "They have been removed from data")
     message(msg)
 
-    data %<>% dplyr::filter(!(!!species %in% sp_missing))
+    data <- data[! data[[sp_chr]] %in% sp_missing, ]
   }
 
   # Del species for which the number of individuals is inferior to the number of
@@ -520,7 +523,8 @@ sanatize_metaweb <- function(
     "They have been removed from data")
     message(msg)
 
-    data %<>% dplyr::filter(!(!!species %in% sp_to_low))
+
+    data <- data[! data[[sp_chr]] %in% sp_to_low, ]
   }
   data
 }
