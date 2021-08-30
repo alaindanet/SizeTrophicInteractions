@@ -8,6 +8,7 @@ sanatize_metaweb(
   data = NULL,
   species = NULL,
   fish_diet_shift = NULL,
+  resource_diet_shift = NULL,
   nb_class = NULL
 )
 }

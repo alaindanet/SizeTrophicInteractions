@@ -41,8 +41,13 @@ build_metaweb <- function(data, species, size, pred_win, beta_min, beta_max,
   beta_max <- rlang::enquo(beta_max)
 
   # Check
-  data <- sanatize_metaweb(data = data,
-    species = !!species, fish_diet_shift = fish_diet_shift, nb_class = nb_class)
+  data <- sanatize_metaweb(
+    data = data,
+    species = !!species,
+    fish_diet_shift = fish_diet_shift,
+    resource_diet_shift = resource_diet_shift,
+    nb_class = nb_class
+  )
   # TODO: Check concordance of column names between datasets
   ## eg. species, (life_stage), low_bound, upper_bound, fish
 
@@ -484,14 +489,27 @@ sanatize_metaweb <- function(
   data = NULL,
   species = NULL,
   fish_diet_shift = NULL,
+  resource_diet_shift = NULL,
   nb_class = NULL) {
 
   #Capture var:
   species <- rlang::enquo(species)
   sp_chr <- rlang::quo_name(species)
-  
+
   data_sp <- unique(data[[sp_chr]])
   onto_sp <- unique(fish_diet_shift[[sp_chr]])
+
+  # Stop if resource species are not found in fish diet data
+  mask_res_missing <-
+    !resource_diet_shift[[sp_chr]] %in% colnames(fish_diet_shift)
+  if (any(mask_res_missing)) {
+    res_missing <- resource_diet_shift[[sp_chr]][mask_res_missing]
+    msg <- c(
+      "The following resources are not found in fish_diet_shift: ",
+      paste(res_missing, "\n", sep = ", "),
+      "They should be present to build the metaweb !")
+    stop(msg)
+  }
 
   ## Del species for which life traits are not filled
   sp_missing <- data_sp[!data_sp %in% onto_sp]

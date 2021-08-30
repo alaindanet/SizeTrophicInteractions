@@ -112,18 +112,15 @@ test_that("We get a correct prey size dataframe", {
 
 })
 
-test_that("Missing pred win is working", {
 
-  missing_prey_win <-  
-  th_prey_size <- compute_prey_size(
-    classes_species, fake_prey_win, species, beta_min, beta_max, pred_win_method = "midpoint")
 test_that("We get a correct prey size dataframe", {
   expect_s3_class(th_prey_size, "data.frame")
   expected_prey_size <- classes_species %>%
     mutate(
-    min_prey = 0.03 * ( (lower + upper) / 2),
-    max_prey = 0.45 * ( (lower + upper) / 2)
-    ) %>% dplyr::select(-lower, -upper)
+      min_prey = 0.03 * ((lower + upper) / 2),
+      max_prey = 0.45 * ((lower + upper) / 2)
+      ) %>%
+  dplyr::select(-lower, -upper)
 
   expect_identical(th_prey_size, expected_prey_size)
 
@@ -272,6 +269,24 @@ test_that("Sanitize fish_length works", {
     })
 
 
+
+test_that("Sanitize fish_diet works", {
+  fake_resource_shift %<>%
+    mutate(species = c("che", "paras"))
+
+  expect_error(
+    fake <- sanatize_metaweb(
+      data = fake,
+      species = species,
+      fish_diet_shift = fake_onto_diet_shift,
+      resource_diet_shift = fake_resource_shift,
+      nb_class = 9)
+    ,
+    "The following resources are not found in fish_diet_shift"
+ )
+    })
+
+
 test_that("Function works with other species names", {
 
   renamed_species <- purrr::map(
@@ -305,3 +320,4 @@ test_that("Function works with other species names", {
  )
   expect_equal(unique(fake$species), "Salameche")
     })
+
