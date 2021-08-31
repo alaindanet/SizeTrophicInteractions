@@ -4,7 +4,7 @@
 \alias{get_size_class}
 \title{Get size classes for a given species}
 \usage{
-get_size_class(data, species_name, var, classes)
+get_size_class(data, species_name, var, classes, species_var = NULL)
 }
 \arguments{
 \item{data}{a data.frame containing species and size variable.}

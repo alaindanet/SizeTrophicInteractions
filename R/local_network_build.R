@@ -36,10 +36,10 @@ build_local_network <- function(
     data %<>% na.omit
   }
 
-  data <- sanatize_metaweb(data = data,
-    species = !!species, fish_diet_shift = classes,
-    nb_class = max(unique(classes$class_id))
-  )
+  #data <- sanatize_metaweb(data = data,
+    #species = !!species, fish_diet_shift = classes,
+    #nb_class = max(unique(classes$class_id))
+  #)
 
   # Compute the class_id
   classes_assigned <- assign_size_class(data, !!species, !!var, classes)
@@ -149,7 +149,7 @@ assign_size_class <- function (data, species, var, classes) {
       class_id = purrr::pmap(
         list(data = data, species_name = !!species),
         get_size_class,
-        var = !!var, classes = classes)
+        var = !!var, classes = classes, species_var = !!species)
     )
 
   classes_assigned %>%
@@ -169,14 +169,21 @@ assign_size_class <- function (data, species, var, classes) {
 #'
 #' @return data.frame containing local network code and interaction matrix.
 #' @export
-get_size_class <- function (data, species_name, var, classes) {
+get_size_class <- function (data, species_name, var, classes, species_var = NULL) {
   
   var <- rlang::enquo(var)
   species_name <- rlang::enquo(species_name)
+  species_var <- rlang::enquo(species_var)
+  #if (!is.null(species)) {
+    #species <- rlang::quo(species)
+  #} else {
+    #species <- "species"
+    #species <- rlang::quo(species)
+  #}
 
   #Get species classes
   if (!rlang::quo_is_null(species_name)) {
-  classes %<>% dplyr::filter(species == rlang::quo_name(species_name))
+    classes <- classes[classes[[rlang::quo_name(species_var)]] == rlang::quo_name(species_name), ] 
   }
   classes %<>%
   dplyr::select(lower, upper)
